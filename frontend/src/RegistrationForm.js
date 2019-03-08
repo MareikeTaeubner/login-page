@@ -46,11 +46,31 @@ function submit(e, username, password, password2, cb) {
   e.preventDefault();
   verifyPassword(password, password2)
     .then(() => verifyUsername(username))
-    .then(() => console.log("submit me!"))
+    .then(() => sendDataToServer({ username, password }))
     .catch(error => {
       console.error(error);
       cb(error.message);
     });
+}
+
+async function sendDataToServer(credentials) {
+  const response = await fetch("/register", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify(credentials)
+  });
+
+  // consume response body
+  await response.blob();
+
+  if (response.ok) {
+    // it worked
+    console.log("ok");
+  } else {
+    throw new Error("registration failed. Try again later");
+  }
 }
 
 /**
