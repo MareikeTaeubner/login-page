@@ -45,59 +45,49 @@ function RegistrationForm() {
 function submit(e, username, password, password2, cb) {
   e.preventDefault();
   verifyPassword(password, password2)
-    .then(res => {
-      if (res.ok) {
-        //submit
-      } else {
-        throw new Error(res.message);
-      }
-    })
+    .then(() => verifyUsername(username))
+    .then(() => console.log("submit me!"))
     .catch(error => {
       console.error(error);
       cb(error.message);
     });
 }
 
+function verifyUsername(username) {
+  if (!username || username.length < 1) {
+    throw new Error("Username was not entered");
+  }
+}
+
 /**
- * Verifies the given password inputs.
+ * Verifies the given password inputs. Rejects if
+ * the given passwords fail the verification.
  *
  * @param {string} password1 the password
  * @param {string} password2 the repeated password
- * @returns {Promise<{ok: boolean, message?: string}>} the result of the verification
+ * @returns {Promise<void>} a promise that resolves if the given input was sucessfully verified.
  */
 async function verifyPassword(password1, password2) {
   if (password1 !== password2) {
-    return {
-      ok: false,
-      message: "Password and repeated password are not equal. Typo?"
-    };
+    throw new Error("Password and repeated password are not equal. Typo?");
   }
 
   if (!password1 || password1.length <= 4) {
-    return {
-      ok: false,
-      message: "Password was too short, choose a longer password"
-    };
+    throw new Error("Password was too short, choose a longer password");
   }
 
   if (password1.length > 160) {
-    return {
-      ok: false,
-      message: "Passwords was too long, 160 characters should be reasonable :)"
-    };
+    throw new Error(
+      "Passwords was too long, 160 characters should be reasonable :)"
+    );
   }
 
   const numberOfBreaches = await passwordCheck(password1);
   if (numberOfBreaches > 0) {
-    return {
-      ok: false,
-      message: `This password was exposed in ${numberOfBreaches} database breaches and is therefore not a secure password`
-    };
+    throw new Error(
+      `This password was exposed in ${numberOfBreaches} database breaches and is therefore not a secure password`
+    );
   }
-
-  return {
-    ok: true
-  };
 }
 
 /**
