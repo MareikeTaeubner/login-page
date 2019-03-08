@@ -53,6 +53,13 @@ function submit(e, username, password, password2, cb) {
     });
 }
 
+/**
+ * Verifies the given username.
+ * Throws an error if the username fails the verification.
+ *
+ * @param {string} username the username
+ *
+ */
 function verifyUsername(username) {
   if (!username || username.length < 1) {
     throw new Error("Username was not entered");
